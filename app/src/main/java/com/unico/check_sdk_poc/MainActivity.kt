@@ -80,10 +80,8 @@ class MainActivity : AppCompatActivity(), AcessoBioListener, iAcessoBioSelfie, S
     }
 
     override fun onUserClosedCameraManually() {
-//        Log.d(TAG, "onUserClosedCameraManually")
-        Log.d(TAG, "onUserClosedCameraManually - id ${this@MainActivity.hashCode()}  ${this@MainActivity}")
+        Log.d(TAG, "onUserClosedCameraManually")
         textField.text = "Camera fechada manualmente."
-        finish()
     }
 
     override fun onSystemClosedCameraTimeoutSession() {
@@ -109,8 +107,7 @@ class MainActivity : AppCompatActivity(), AcessoBioListener, iAcessoBioSelfie, S
 
     override fun onCameraReady(p0: UnicoCheckCameraOpener.Selfie?) {
         p0?.open(this)
-//        Log.d(TAG, "onCameraReady")
-        Log.d(TAG, "onCameraReady - id ${this@MainActivity.hashCode()}  ${this@MainActivity}")
+        Log.d(TAG, "onCameraReady")
     }
 
     override fun onCameraReady(p0: UnicoCheckCameraOpener.Document?) {
