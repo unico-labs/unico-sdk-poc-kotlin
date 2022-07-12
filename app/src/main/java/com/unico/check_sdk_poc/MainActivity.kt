@@ -65,8 +65,7 @@ class MainActivity : AppCompatActivity(), AcessoBioListener, iAcessoBioSelfie, S
         Thread(Runnable {
             this@MainActivity.runOnUiThread(java.lang.Runnable {
                 AcessoBio(this, this)
-                    .setAutoCapture(true)
-                    .setSmartFrame(true)
+                    .setTimeoutSession(600.0)
                     .build()
                     .prepareDocumentCamera(UnicoConfig(), this@MainActivity)
             })
