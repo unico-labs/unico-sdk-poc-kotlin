@@ -2,6 +2,8 @@ package com.unico.check_sdk_poc
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.CountDownTimer
+import android.os.Handler
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
@@ -23,12 +25,14 @@ class MainActivity : AppCompatActivity(), AcessoBioListener, iAcessoBioSelfie, S
     iAcessoBioDocument, DocumentCameraListener {
 
     lateinit var textField: TextView
+    lateinit var loadingDialog: LoadingDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         textField = findViewById(R.id.mainText)
+        loadingDialog = LoadingDialog(this@MainActivity)
     }
 
     fun openCameraManual(view : View){
@@ -62,15 +66,22 @@ class MainActivity : AppCompatActivity(), AcessoBioListener, iAcessoBioSelfie, S
     }
 
     fun openCameraDocument(view: View){
-        Thread(Runnable {
-            this@MainActivity.runOnUiThread(java.lang.Runnable {
-                AcessoBio(this, this)
-                    .setAutoCapture(true)
-                    .setSmartFrame(true)
-                    .build()
-                    .prepareDocumentCamera(UnicoConfig(), this@MainActivity)
-            })
-        }).start()
+        loadingDialog.startLoading();
+
+        AcessoBio(this, this)
+            .build()
+            .prepareSelfieCamera(UnicoConfigLiveness(), this@MainActivity)
+
+//        object : CountDownTimer(5000, 1000) {
+//
+//            override fun onTick(millisUntilFinished: Long) {
+//                // do Nothing
+//            }
+//
+//            override fun onFinish() {
+//                loadingDialog.dismissLoading();
+//            }
+//        }.start()
     }
 
     override fun onErrorAcessoBio(p0: ErrorBio?) {
@@ -106,6 +117,7 @@ class MainActivity : AppCompatActivity(), AcessoBioListener, iAcessoBioSelfie, S
     }
 
     override fun onCameraReady(p0: UnicoCheckCameraOpener.Selfie?) {
+        loadingDialog.dismissLoading();
         p0?.open(this)
         Log.d(TAG, "onCameraReady")
     }
@@ -115,6 +127,7 @@ class MainActivity : AppCompatActivity(), AcessoBioListener, iAcessoBioSelfie, S
     }
 
     override fun onCameraFailed(p0: String?) {
+        loadingDialog.dismissLoading();
         if (p0 != null) {
             Log.e(TAG, p0)
             textField.text = p0
