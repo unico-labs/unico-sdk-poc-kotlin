@@ -36,33 +36,31 @@ class MainActivity : AppCompatActivity(), AcessoBioListener, iAcessoBioSelfie, S
     }
 
     fun openCameraManual(view : View){
-        Thread(Runnable {
-            this@MainActivity.runOnUiThread(java.lang.Runnable {
-                AcessoBio(this, this)
-                    .setAutoCapture(false)
-                    .setSmartFrame(false)
-                    .build()
-                    .prepareSelfieCamera(UnicoConfig(), this@MainActivity)
-            })
-        }).start()
+        loadingDialog.startLoading();
+
+        AcessoBio(this, this)
+            .setAutoCapture(false)
+            .setSmartFrame(false)
+            .build()
+            .prepareSelfieCamera(UnicoConfig(), this@MainActivity)
     }
 
     fun openCameraSmart(view: View){
-        Thread(Runnable {
-            this@MainActivity.runOnUiThread(java.lang.Runnable {
-                AcessoBio(this, this)
-                    .setAutoCapture(true)
-                    .setSmartFrame(true)
-                    .build()
-                    .prepareSelfieCamera(UnicoConfig(), this@MainActivity)
-            })
-        }).start()
+        loadingDialog.startLoading();
+
+        AcessoBio(this, this)
+            .setAutoCapture(true)
+            .setSmartFrame(true)
+            .build()
+            .prepareSelfieCamera(UnicoConfig(), this@MainActivity)
     }
 
     fun openCameraLiveness(view: View){
-            AcessoBio(this, this)
-                .build()
-                .prepareSelfieCamera(UnicoConfigLiveness(), this@MainActivity)
+        loadingDialog.startLoading();
+
+        AcessoBio(this, this)
+            .build()
+            .prepareSelfieCamera(UnicoConfigLiveness(), this@MainActivity)
     }
 
     fun openCameraDocument(view: View){
@@ -70,18 +68,7 @@ class MainActivity : AppCompatActivity(), AcessoBioListener, iAcessoBioSelfie, S
 
         AcessoBio(this, this)
             .build()
-            .prepareSelfieCamera(UnicoConfigLiveness(), this@MainActivity)
-
-//        object : CountDownTimer(5000, 1000) {
-//
-//            override fun onTick(millisUntilFinished: Long) {
-//                // do Nothing
-//            }
-//
-//            override fun onFinish() {
-//                loadingDialog.dismissLoading();
-//            }
-//        }.start()
+            .prepareDocumentCamera(UnicoConfig(), this@MainActivity)
     }
 
     override fun onErrorAcessoBio(p0: ErrorBio?) {
@@ -135,11 +122,13 @@ class MainActivity : AppCompatActivity(), AcessoBioListener, iAcessoBioSelfie, S
     }
 
     override fun onSuccessDocument(p0: ResultCamera?) {
+        loadingDialog.dismissLoading();
         Log.d(TAG, "onSuccessDocument")
         textField.text = "Documento capturado com sucesso"
     }
 
     override fun onErrorDocument(p0: String?) {
+        loadingDialog.dismissLoading();
         Log.e(TAG, p0.toString())
         textField.text = p0
     }
