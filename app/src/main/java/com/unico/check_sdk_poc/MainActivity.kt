@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.ImageView
 import android.widget.TextView
 import com.acesso.acessobio_android.AcessoBioListener
 import com.acesso.acessobio_android.iAcessoBioDocument
@@ -32,45 +31,33 @@ class MainActivity : AppCompatActivity(), AcessoBioListener, iAcessoBioSelfie, S
     }
 
     fun openCameraManual(view : View){
-        Thread(Runnable {
-            this@MainActivity.runOnUiThread(java.lang.Runnable {
-                AcessoBio(this, this)
-                    .setAutoCapture(false)
-                    .setSmartFrame(false)
-                    .build()
-                    .prepareSelfieCamera(UnicoConfig(), this@MainActivity)
-            })
-        }).start()
+        AcessoBio(this, this)
+            .setAutoCapture(false)
+            .setSmartFrame(false)
+            .build()
+            .prepareSelfieCamera(UnicoConfig(), this@MainActivity)
     }
 
     fun openCameraSmart(view: View){
-        Thread(Runnable {
-            this@MainActivity.runOnUiThread(java.lang.Runnable {
-                AcessoBio(this, this)
-                    .setAutoCapture(true)
-                    .setSmartFrame(true)
-                    .build()
-                    .prepareSelfieCamera(UnicoConfig(), this@MainActivity)
-            })
-        }).start()
-    }
+        AcessoBio(this, this)
+            .setAutoCapture(true)
+            .setSmartFrame(true)
+            .build()
+            .prepareSelfieCamera(UnicoConfig(), this@MainActivity)
+}
 
     fun openCameraLiveness(view: View){
-            AcessoBio(this, this)
-                .build()
-                .prepareSelfieCamera(UnicoConfigLiveness(), this@MainActivity)
+        AcessoBio(this, this)
+            .build()
+            .prepareSelfieCamera(UnicoConfigLiveness(), this@MainActivity)
     }
 
     fun openCameraDocument(view: View){
-        Thread(Runnable {
-            this@MainActivity.runOnUiThread(java.lang.Runnable {
-                AcessoBio(this, this)
-                    .setAutoCapture(true)
-                    .setSmartFrame(true)
-                    .build()
-                    .prepareDocumentCamera(UnicoConfig(), this@MainActivity)
-            })
-        }).start()
+        AcessoBio(this, this)
+            .setAutoCapture(true)
+            .setSmartFrame(true)
+            .build()
+            .prepareDocumentCamera(UnicoConfig(), this@MainActivity)
     }
 
     override fun onErrorAcessoBio(p0: ErrorBio?) {
