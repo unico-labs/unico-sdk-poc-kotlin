@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity(), AcessoBioListener, iAcessoBioSelfie, S
             .setAutoCapture(false)
             .setSmartFrame(false)
             .build()
-            .prepareSelfieCamera(UnicoConfig(), this@MainActivity)
+            .prepareSelfieCamera("unicoConfig.json", this@MainActivity)
     }
 
     fun openCameraSmart(view: View){
@@ -43,13 +43,13 @@ class MainActivity : AppCompatActivity(), AcessoBioListener, iAcessoBioSelfie, S
             .setAutoCapture(true)
             .setSmartFrame(true)
             .build()
-            .prepareSelfieCamera(UnicoConfig(), this@MainActivity)
+            .prepareSelfieCamera("unicoConfig.json", this@MainActivity)
 }
 
     fun openCameraLiveness(view: View){
         AcessoBio(this, this)
             .build()
-            .prepareSelfieCamera(UnicoConfigLiveness(), this@MainActivity)
+            .prepareSelfieCamera("unicoConfigLiveness.json", this@MainActivity)
     }
 
     fun openCameraDocument(view: View){
@@ -57,7 +57,7 @@ class MainActivity : AppCompatActivity(), AcessoBioListener, iAcessoBioSelfie, S
             .setAutoCapture(true)
             .setSmartFrame(true)
             .build()
-            .prepareDocumentCamera(UnicoConfig(), this@MainActivity)
+            .prepareDocumentCamera("unicoConfig.json", this@MainActivity)
     }
 
     override fun onErrorAcessoBio(p0: ErrorBio?) {

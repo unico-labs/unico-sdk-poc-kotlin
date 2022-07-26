@@ -1,0 +1,17 @@
+{
+  "project_info": {
+    "project_number": "",
+    "project_id": "",
+    "project_j_apikey": ""
+  },
+  "client_info": {
+    "mobilesdk_app_id": "",
+    "android_client_info": {
+      "package_name": ""
+    }
+  },
+  "host_info": {
+    "host_info": "",
+    "host_key": ""
+  }
+}
