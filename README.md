@@ -4,11 +4,11 @@
   </a>
 </p>
 
-<h1 align='center'>SDK Flutter</h1>
+<h1 align='center'>SDK Android</h1>
 
 <div align='center'>
   
-  ### POC de implementação do SDK web unico | check em Flutter
+  ### POC de implementação do SDK Android unico | check em Kotlin
   
   ![SDK](https://img.shields.io/badge/SDK-v4.1.5-blueviolet?logo=)
   ![ANDROID](https://img.shields.io/badge/Android-grey?logo=android)
