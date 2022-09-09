@@ -22,6 +22,7 @@ class MainActivity : AppCompatActivity(), AcessoBioListener, iAcessoBioSelfie, S
     iAcessoBioDocument, DocumentCameraListener {
 
     lateinit var textField: TextView
+    var unicoTheme = UnicoTheme()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,6 +35,7 @@ class MainActivity : AppCompatActivity(), AcessoBioListener, iAcessoBioSelfie, S
         AcessoBio(this, this)
             .setAutoCapture(false)
             .setSmartFrame(false)
+           .setTheme(this.unicoTheme)
             .build()
             .prepareSelfieCamera(UnicoConfig(), this@MainActivity)
     }
@@ -42,12 +44,14 @@ class MainActivity : AppCompatActivity(), AcessoBioListener, iAcessoBioSelfie, S
         AcessoBio(this, this)
             .setAutoCapture(true)
             .setSmartFrame(true)
+            .setTheme(this.unicoTheme)
             .build()
             .prepareSelfieCamera(UnicoConfig(), this@MainActivity)
-}
+    }
 
     fun openCameraLiveness(view: View){
         AcessoBio(this, this)
+            .setTheme(this.unicoTheme)
             .build()
             .prepareSelfieCamera(UnicoConfigLiveness(), this@MainActivity)
     }
@@ -56,6 +60,7 @@ class MainActivity : AppCompatActivity(), AcessoBioListener, iAcessoBioSelfie, S
         AcessoBio(this, this)
             .setAutoCapture(true)
             .setSmartFrame(true)
+            .setTheme(this.unicoTheme)
             .build()
             .prepareDocumentCamera(UnicoConfig(), this@MainActivity)
     }
