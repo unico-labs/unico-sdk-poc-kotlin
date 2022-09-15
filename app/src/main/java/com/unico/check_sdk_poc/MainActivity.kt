@@ -98,11 +98,6 @@ class MainActivity : AppCompatActivity(), AcessoBioListener,
         textField.text = message
     }
 
-    override fun onCameraReady(p0: UnicoCheckCameraOpener.Selfie?) {
-        p0?.open(this)
-        Log.d(TAG, "onCameraReady")
-    }
-
     override fun onCameraReady(p0: UnicoCheckCameraOpener.Document?) {
         p0?.open(DocumentType.CNH, this)
     }
