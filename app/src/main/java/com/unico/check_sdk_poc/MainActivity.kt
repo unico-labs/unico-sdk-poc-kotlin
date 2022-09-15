@@ -9,16 +9,17 @@ import com.acesso.acessobio_android.AcessoBioListener
 import com.acesso.acessobio_android.iAcessoBioDocument
 import com.acesso.acessobio_android.iAcessoBioSelfie
 import com.acesso.acessobio_android.onboarding.AcessoBio
+import com.acesso.acessobio_android.onboarding.camera.CameraListener
 import com.acesso.acessobio_android.onboarding.camera.UnicoCheckCameraOpener
 import com.acesso.acessobio_android.onboarding.camera.document.DocumentCameraListener
-import com.acesso.acessobio_android.onboarding.camera.selfie.SelfieCameraListener
 import com.acesso.acessobio_android.onboarding.types.DocumentType
 import com.acesso.acessobio_android.services.dto.ErrorBio
 import com.acesso.acessobio_android.services.dto.ResultCamera
 
 var TAG = "MainActivity"
 
-class MainActivity : AppCompatActivity(), AcessoBioListener, iAcessoBioSelfie, SelfieCameraListener,
+class MainActivity : AppCompatActivity(), AcessoBioListener,
+    iAcessoBioSelfie, CameraListener,
     iAcessoBioDocument, DocumentCameraListener {
 
     lateinit var textField: TextView
@@ -35,9 +36,9 @@ class MainActivity : AppCompatActivity(), AcessoBioListener, iAcessoBioSelfie, S
         AcessoBio(this, this)
             .setAutoCapture(false)
             .setSmartFrame(false)
-           .setTheme(this.unicoTheme)
+            .setTheme(this.unicoTheme)
             .build()
-            .prepareSelfieCamera(UnicoConfig(), this@MainActivity)
+            .prepareCamera(UnicoConfig(), this@MainActivity)
     }
 
     fun openCameraSmart(view: View){
@@ -46,14 +47,14 @@ class MainActivity : AppCompatActivity(), AcessoBioListener, iAcessoBioSelfie, S
             .setSmartFrame(true)
             .setTheme(this.unicoTheme)
             .build()
-            .prepareSelfieCamera(UnicoConfig(), this@MainActivity)
+            .prepareCamera(UnicoConfig(), this@MainActivity)
     }
 
     fun openCameraLiveness(view: View){
         AcessoBio(this, this)
             .setTheme(this.unicoTheme)
             .build()
-            .prepareSelfieCamera(UnicoConfigLiveness(), this@MainActivity)
+            .prepareCamera(UnicoConfigLiveness(), this@MainActivity)
     }
 
     fun openCameraDocument(view: View){
@@ -111,6 +112,11 @@ class MainActivity : AppCompatActivity(), AcessoBioListener, iAcessoBioSelfie, S
             Log.e(TAG, p0)
             textField.text = p0
         }
+    }
+
+    override fun onCameraReady(cameraOpener: UnicoCheckCameraOpener.Camera) {
+        cameraOpener?.open(this)
+        Log.d(TAG, "onCameraReady")
     }
 
     override fun onSuccessDocument(p0: ResultCamera?) {
