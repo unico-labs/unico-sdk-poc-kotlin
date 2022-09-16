@@ -208,7 +208,7 @@ override fun onErrorSelfie(p0: ErrorBio?) { }
 
 </p>
 
-Devemos carregar a câmera utilizando o método `prepareSelfieCamera` e na sequência abrir com o método `open`. Exemplo abaixo:
+Devemos carregar a câmera utilizando o método `prepareCamera` e na sequência abrir com o método `open`. Exemplo abaixo:
 
 ```
 fun openCameraSmart(view: View){
@@ -216,10 +216,10 @@ fun openCameraSmart(view: View){
             .setAutoCapture(true)
             .setSmartFrame(true)
             .build()
-            .prepareSelfieCamera(UnicoConfig(), this@MainActivity)
+            .prepareCamera(UnicoConfig(), this@MainActivity)
     }
 
-override fun onCameraReady(p0: UnicoCheckCameraOpener.Selfie?) {
+override fun onCameraReady(p0: UnicoCheckCameraOpener.Camera?) {
         p0?.open(this)
         Log.d(TAG, "onCameraReady")
     }
