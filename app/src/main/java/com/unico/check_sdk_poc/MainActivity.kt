@@ -23,6 +23,7 @@ class MainActivity : AppCompatActivity(), AcessoBioListener,
     iAcessoBioDocument, DocumentCameraListener {
 
     lateinit var textField: TextView
+    lateinit var documentType: DocumentType
     var unicoTheme = UnicoTheme()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,13 +58,26 @@ class MainActivity : AppCompatActivity(), AcessoBioListener,
             .prepareCamera(UnicoConfigLiveness(), this@MainActivity)
     }
 
-    fun openCameraDocument(view: View){
+    fun openCameraDocumentCNHFront(view: View){
         AcessoBio(this, this)
             .setAutoCapture(true)
             .setSmartFrame(true)
             .setTheme(this.unicoTheme)
             .build()
             .prepareDocumentCamera(UnicoConfig(), this@MainActivity)
+
+        documentType = DocumentType.CNH_FRENTE
+    }
+
+    fun openCameraDocumentCNHBack(view: View){
+        AcessoBio(this, this)
+            .setAutoCapture(true)
+            .setSmartFrame(true)
+            .setTheme(this.unicoTheme)
+            .build()
+            .prepareDocumentCamera(UnicoConfig(), this@MainActivity)
+
+        documentType = DocumentType.CNH_VERSO
     }
 
     override fun onErrorAcessoBio(p0: ErrorBio?) {
@@ -99,7 +113,7 @@ class MainActivity : AppCompatActivity(), AcessoBioListener,
     }
 
     override fun onCameraReady(p0: UnicoCheckCameraOpener.Document?) {
-        p0?.open(DocumentType.CNH, this)
+        p0?.open(documentType, this)
     }
 
     override fun onCameraFailed(p0: String?) {
