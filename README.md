@@ -10,7 +10,7 @@
   
   ### POC de implementação do SDK Android unico | check em Kotlin
   
-  ![SDK](https://img.shields.io/badge/SDK-v4.1.5-blueviolet?logo=)
+  ![SDK](https://img.shields.io/badge/SDK-v4.2.4-blueviolet?logo=)
   ![ANDROID](https://img.shields.io/badge/Android-grey?logo=android)
 </div>
 
