@@ -52,10 +52,15 @@ class MainActivity : AppCompatActivity(), AcessoBioListener,
     }
 
     fun openCameraLiveness(view: View){
-        AcessoBio(this, this)
-            .setTheme(this.unicoTheme)
-            .build()
-            .prepareCamera(UnicoConfigLiveness(), this@MainActivity)
+        Log.d(TAG, "openCameraLiveness")
+        try {
+            AcessoBio(this, this)
+                .setTheme(this.unicoTheme)
+                .build()
+                .prepareCamera(UnicoConfigLiveness(), this@MainActivity)
+        } catch(e: Exception) {
+            Log.e(TAG, e.toString())
+        }
     }
 
     fun openCameraDocumentCNHFront(view: View){
