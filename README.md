@@ -10,15 +10,15 @@
   
   ### POC de implementação do SDK Android unico | check em Kotlin
   
-  ![SDK](https://img.shields.io/badge/SDK-v4.2.6-blueviolet?logo=)
   ![ANDROID](https://img.shields.io/badge/Android-grey?logo=android)
 </div>
 
 ## 💻 Compatibilidade
 
-### Versões
+### Versões mínimas
 
-- Versão mínima do Android 5.0 (API de nível 21)
+- Android 5.0 (API de nível 21)
+- Kotlin 1.6
 
 ### Dispositivos compatíveis
 
