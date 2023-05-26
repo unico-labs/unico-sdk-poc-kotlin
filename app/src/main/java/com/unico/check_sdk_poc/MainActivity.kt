@@ -24,7 +24,8 @@ class MainActivity : AppCompatActivity(), AcessoBioListener,
 
     lateinit var textField: TextView
     lateinit var documentType: DocumentType
-    var unicoTheme = UnicoTheme()
+    val unicoTheme = UnicoTheme()
+    val timeout = 50.0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,6 +39,7 @@ class MainActivity : AppCompatActivity(), AcessoBioListener,
             .setAutoCapture(false)
             .setSmartFrame(false)
             .setTheme(this.unicoTheme)
+            .setTimeoutSession(this.timeout)
             .build()
             .prepareCamera(UnicoConfig(), this@MainActivity)
     }
@@ -47,6 +49,7 @@ class MainActivity : AppCompatActivity(), AcessoBioListener,
             .setAutoCapture(true)
             .setSmartFrame(true)
             .setTheme(this.unicoTheme)
+            .setTimeoutSession(this.timeout)
             .build()
             .prepareCamera(UnicoConfig(), this@MainActivity)
     }
@@ -56,6 +59,7 @@ class MainActivity : AppCompatActivity(), AcessoBioListener,
         try {
             AcessoBio(this, this)
                 .setTheme(this.unicoTheme)
+                .setTimeoutSession(this.timeout)
                 .build()
                 .prepareCamera(UnicoConfigLiveness(), this@MainActivity)
         } catch(e: Exception) {
@@ -68,6 +72,7 @@ class MainActivity : AppCompatActivity(), AcessoBioListener,
             .setAutoCapture(true)
             .setSmartFrame(true)
             .setTheme(this.unicoTheme)
+            .setTimeoutSession(this.timeout)
             .build()
             .prepareDocumentCamera(UnicoConfig(), this@MainActivity)
 
@@ -79,6 +84,7 @@ class MainActivity : AppCompatActivity(), AcessoBioListener,
             .setAutoCapture(true)
             .setSmartFrame(true)
             .setTheme(this.unicoTheme)
+            .setTimeoutSession(this.timeout)
             .build()
             .prepareDocumentCamera(UnicoConfig(), this@MainActivity)
 
