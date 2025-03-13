@@ -1,42 +1,45 @@
-<p align='center'>
-  <a href='https://unico.io'>
-    <img width='350' src='https://unico.io/wp-content/uploads/2022/07/check.svg'></img>
+<p align="center">
+  <a href="https://unico.io">
+    <img width="350" src="https://unico.io/wp-content/uploads/2024/05/idcloud-horizontal-color.svg">
   </a>
 </p>
 
-<h1 align='center'>SDK Android</h1>
+<h1 align="center">SDK Android</h1>
 
-<div align='center'>
+<div align="center">
   
-  ### POC de implementação do SDK Android unico | check em Kotlin
+### POC de implementação do SDK Android Unico | Check em Kotlin
   
-  ![ANDROID](https://img.shields.io/badge/Android-grey?logo=android)
+![ANDROID](https://img.shields.io/badge/Android-grey?logo=android)
 </div>
+
+---
 
 ## 💻 Compatibilidade
 
-### Versões mínimas
+### 📌 Versões Mínimas
 
-- Android 5.0 (API de nível 21)
-- Kotlin 1.6
+- **Android:** 5.0 (API nível 21)
+- **Kotlin:** 1.6
 
-### Dispositivos compatíveis
+### 📱 Dispositivos Compatíveis
 
-- Você pode conferior os aparelhos testados em nossos laboratórios <a href='https://developers.unico.io/guias/android/overview#disposit%C3%ADvos-compat%C3%ADveis'>nesta</a> lista de dispositivos.
+Você pode conferir os aparelhos testados em nossos laboratórios nesta [lista de dispositivos](https://developers.unico.io/guias/android/overview#disposit%C3%ADvos-compat%C3%ADveis).
 
+---
 
-## ✨ Como começar
+## ✨ Como Começar
 
-### Ambiente de desenvolvimento & Credenciais Unico
+### 🚀 Ambiente de Desenvolvimento & Credenciais Unico
 
-- Primeiramente, você deve ter certeza que seu ambiente de desenvolvimento possuir o Android Studio (<a href='https://www.google.com/aclk?sa=l&ai=DChcSEwinnIeI4fH5AhX1QUgAHQeSBE4YABAAGgJjZQ&sig=AOD64_0aJo6DoyhwSY1Tw2aTGjg5R_0chw&q&adurl&ved=2ahUKEwiFiYCI4fH5AhW_IbkGHc1eDi0Q0Qx6BAgDEAE'>link</a>) instalado.
-- Para utilizar nossos SDKs, você deve importar as credenciais unico (Client API Key) em seu projeto. Utilize <a href='https://developers.unico.io/guias/android/como-comecar#obtendo-suas-credenciais'>este</a> passo a passo para gerar as credenciais.
+- **Android Studio:** Certifique-se de ter o [Android Studio](https://www.google.com/aclk?sa=l&ai=DChcSEwinnIeI4fH5AhX1QUgAHQeSBE4YABAAGgJjZQ&sig=AOD64_0aJo6DoyhwSY1Tw2aTGjg5R_0chw&q&adurl&ved=2ahUKEwiFiYCI4fH5AhW_IbkGHc1eDi0Q0Qx6BAgDEAE) instalado.
+- **Credenciais Unico:** Para utilizar nossos SDKs, você deve importar as credenciais Unico (Client API Key) em seu projeto. Siga [este passo a passo](https://developers.unico.io/guias/android/como-comecar#obtendo-suas-credenciais) para gerar as credenciais.
 
-Depois de configurar a API Key e obter o bundle da aplicação Android com os dados do JSON, basta informá-los como parâmetros ao instanciar a classe `UnicoConfig`, que será utilizado posteriormente no método de preparação de câmera o ".prepareCamera()".
+Após configurar a API Key e obter o bundle da aplicação Android com os dados do JSON, informe-os como parâmetros ao instanciar a classe `UnicoConfig`, que será utilizada posteriormente no método de preparação da câmera, o `prepareCamera()`.
 
-Segue o exemplo abaixo:
+Exemplo:
 
-```
+```kotlin
 package <package_name>
 
 import com.acesso.acessobio_android.onboarding.AcessoBioConfigDataSource
@@ -67,35 +70,40 @@ class UnicoConfig : AcessoBioConfigDataSource {
     }
 }
 ```
+
+---
+
 ## 📦 Instalação
 
-### Permissões para utilizar a câmera
+### 🔒 Permissões para Utilizar a Câmera
 
-Para utilizar o método de abertura de câmera é necessário adicionar as permissões antes de compilar a aplicação.
+Antes de compilar a aplicação, adicione as seguintes permissões no arquivo:
+`android > app > src > main > AndroidManifest.xml`
 
-Insira as tags abaixo em:
-- `android > app > src > main > AndroidManifest.xml`
-
-```
+```xml
 <uses-permission android:name="android.permission.CAMERA" />
 <uses-permission android:name="android.permission.INTERNET" />
 ```
 
-### Inclusão da dependência
+### 📥 Inclusão da Dependência
 
-No arquivo app/build.gradle adicione a seguinte dependência:
-```
+No arquivo `app/build.gradle`, adicione a seguinte dependência:
+
+```gradle
 implementation 'com.github.acesso-io:acessobio-android:<version>'
 ```
-Em \<version\>  substitua pela versão mais atual da SDK Android.
 
-## 📷 Captura de selfies
+Substitua `<version>` pela versão mais atual da SDK Android.
 
-### 1️⃣ Inicializar nosso SDK
+---
 
-Crie uma instância do builder (gerado através da interface `IAcessoBioBuilder`) fornecendo como parâmetro o contexto em questão e a implementação da classe `AcessoBioListener`. Sobrescreva nossos métodos de callback com as lógicas de negócio de sua aplicação.
+## 📷 Captura de Selfies
 
-```
+### 1️⃣ Inicializar o SDK
+
+Crie uma instância do builder (gerado através da interface `IAcessoBioBuilder`), fornecendo como parâmetros o contexto atual e a implementação da classe `AcessoBioListener`. Sobrescreva os métodos de callback com a lógica de negócio da sua aplicação:
+
+```kotlin
 internal class MainActivity : AppCompatActivity() {
 
     private val callback = object : AcessoBioListener {
@@ -112,173 +120,160 @@ internal class MainActivity : AppCompatActivity() {
 }
 ```
 
-`onErrorAcessoBio(errorBio: ErrorBio?)`
+> **Detalhes dos Callbacks:**
+>
+> - **`onErrorAcessoBio(errorBio: ErrorBio?)`:** Invocado sempre que ocorrer um erro de implementação, retornando um objeto do tipo `UnicoError` com detalhes do erro.
+> - **`onUserClosedCameraManually()`:** Chamado quando o usuário fecha a câmera manualmente (por exemplo, ao clicar no botão "Voltar").
+> - **`onSystemClosedCameraTimeoutSession()`:** Invocado quando o tempo máximo de sessão é atingido sem capturar nenhuma imagem. (*Nota:* O tempo máximo pode ser configurado via `setTimeoutSession`, que recebe o valor em segundos.)
+> - **`onSystemChangedTypeCameraTimeoutFaceInference()`:** Chamado quando o tempo máximo para detecção da face do usuário é atingido (nenhuma face detectada), alterando automaticamente para o modo manual (sem Smart Frame).
+>
+> **❗ Importante:** Todos os métodos acima devem ser implementados conforme indicado. A ausência de algum deles pode impedir a compilação do projeto.
 
-Este método será invocado sempre quando qualquer erro de implementação ocorrer ao utilizar algum de nossos métodos recebendo um parâmetro do tipo <b>UnicoError</b> que contém detalhes do erro.
+---
 
-`onUserClosedCameraManually()`
+### 2️⃣ Configurar o Modo da Câmera
 
-Este método será invocado sempre quando o usuário fechar a câmera de forma manual, como por exemplo, ao clicar no botão "Voltar".
+#### 🔄 Modo Inteligente (Captura Automática - Smart Camera)
 
-`onSystemClosedCameraTimeoutSession()`
+Por padrão, o SDK possui enquadramento inteligente e captura automática habilitados. Se optar por esse modo, nenhuma configuração adicional é necessária.  
+Caso as configurações da câmera tenham sido alteradas previamente, restaure-as utilizando os métodos `setAutoCapture` e `setSmartFrame`:
 
-Este método será invocado assim que o tempo máximo de sessão for atingido (Sem capturar nenhuma imagem).
-
-O tempo máximo da sessão pode ser configurado em nosso <b>builder</b> através do método `setTimeoutSession`. Este método deve receber o tempo máximo da sessão em <b>segundos</b>.
-
-`onSystemChangedTypeCameraTimeoutFaceInference()`
-
-Este método será invocado assim que o tempo máximo para detecção da face de um usuário for atingido (sem ter nada detectado). Neste caso, o modo de câmera é alterado automaticamente para o modo manual (sem o smart frame).
-
-<hr>
-
-### <strong>❗ Todos os métodos acima devem ser criados da forma indicada em seu projeto (mesmo que sem nenhuma lógica). Caso contrário, o projeto não compilará com sucesso.</strong>
-
-<hr>
-
-### 2️⃣ Configurar modo da câmera
-<p style='font-size: 15px'>
-  <b>Modo inteligente (captura automática - Smart Camera)</b>
-</p>
-
-Por padrão, nosso SDK possui o enquadramento inteligente e a captura automática habilitados. Caso decida utilizar este modo de câmera, não será necessário alterar nenhuma configuração.
-
-Caso as configurações da câmera tenham sido alteradas previamente em seu App, é possível restaurá-las através dos métodos `setAutoCapture` e `setSmartFrame`:
-
-```
+```kotlin
 val unicoCheckCamera: UnicoCheckCamera = acessoBioBuilder
     .setAutoCapture(true)
     .setSmartFrame(true)
     .build()
 ```
-<hr>
 
-### <strong>❗ Não é possível implementar o método <span style='font-size: 15px'> `setAutoCapture(autoCapture: true)` </span> com o método <span style='font-size: 15px'> `setSmartFrame(smartFrame: false)`. </span>Ou seja, não é possível manter a captura automática sem o Smart Frame, pois ele é quem realiza o enquadramento inteligente. </strong>
+> **❗ Atenção:** Não é possível usar `setAutoCapture(true)` com `setSmartFrame(false)`. Ou seja, não é possível manter a captura automática sem o Smart Frame, que é responsável pelo enquadramento inteligente.
 
-<hr>
+#### 🔄 Modo Normal
 
-<p style='font-size: 15px'>
-  <b>Modo normal</b>
-</p>
+Para utilizar o modo manual, desative as configurações do Smart Camera:
 
-Por padrão, nosso SDK possui o enquadramento inteligente e a captura automática habilitados. Neste caso, para utilizar o modo manual ambas configurações relacionadas a Smart Camera devem ser desligadas através dos métodos `setAutoCapture` e `setSmartFrame`:
-
-```
+```kotlin
 val unicoCheckCamera: UnicoCheckCamera = acessoBioBuilder
     .setAutoCapture(false)
     .setSmartFrame(false)
     .build()
 ```
 
-### 3️⃣ Customizar o frame de captura
+---
 
-<strong>Este passo é opcional, porém recomendado.</strong> Oferecemos a possibilidade de customização do frame de captura por meio do nosso SDK. Para customizar o frame, basta utilizar o método correspondente a propriedade a ser customizada, e posteriormente, aplicar o novo estilo através do método `setTheme()`. Para mais informações, consulte em nossa página de <a href='https://developers.unico.io/guias/android/referencias#customiza%C3%A7%C3%B5es'>Referências</a> do SDK. 
+### 3️⃣ Customizar o Frame de Captura
 
-### 4️⃣ Efetuar abertura da câmera
+**Opcional, mas recomendado.**  
+Você pode customizar o frame de captura utilizando o método correspondente à propriedade desejada e, em seguida, aplicar o novo estilo com o método `setTheme()`.  
+Para mais informações, consulte as [Referências do SDK](https://developers.unico.io/guias/android/referencias#customiza%C3%A7%C3%B5es).
 
-Para informar ao método de abertura de câmera "o que fazer" deve ser implantado os <i>listeners</i> que serão chamados em situações de sucesso ou erro. A implementação desses métodos deverá ser feita através de uma instância de classe `UnicoSelfie`.
+---
 
-<p>
+### 4️⃣ Efetuar a Abertura da Câmera
 
-  <b style='font-size: 15px'> Método `onSuccessSelfie` </b>
+Implemente os _listeners_ para tratar os eventos de sucesso ou erro ao abrir a câmera. Essa implementação é realizada através de uma instância da classe `UnicoSelfie`.
 
-</p>
+- **Método `onSuccessSelfie`:**  
+  Chamado ao capturar uma imagem com sucesso, retornando um objeto do tipo `ResultCamera` que será utilizado posteriormente nas chamadas das APIs REST.
 
-Ao efetuar uma captura de imagem com sucesso, este método será invocado e retornará um objeto do tipo `ResultCamera` que será utilizado posteriormente na chamada de nossas APIs REST.
+  ```kotlin
+  override fun onSuccessSelfie(p0: ResultCamera?) { }
+  ```
 
-```
-override fun onSuccessSelfie(p0: ResultCamera?) { }
-```
+- **Método `onErrorSelfie`:**  
+  Invocado quando ocorre um erro na captura de imagem, retornando um objeto do tipo `ErrorBio`.
 
-<p>
+  ```kotlin
+  override fun onErrorSelfie(p0: ErrorBio?) { }
+  ```
 
-  <b style='font-size: 15px'> Método `onErrorSelfie` </b>
+**Abrindo a Câmera:**
 
-</p>
+Utilize o método `prepareCamera` para carregar a câmera e, em seguida, abra-a com o método `open`. Exemplo:
 
-Ao ocorrer algum erro na captura de imagem, este método será invocado e retornará um objeto do tipo `ErrorBio`.
-
-```
-override fun onErrorSelfie(p0: ErrorBio?) { }
-```
-
-<p>
-
-  <b style='font-size: 15px'> Abrir câmera </b>
-
-</p>
-
-Devemos carregar a câmera utilizando o método `prepareCamera` e na sequência abrir com o método `open`. Exemplo abaixo:
-
-```
+```kotlin
 fun openCameraSmart(view: View){
-        AcessoBio(this, this)
-            .setAutoCapture(true)
-            .setSmartFrame(true)
-            .build()
-            .prepareCamera(UnicoConfig(), this@MainActivity)
-    }
+    AcessoBio(this, this)
+        .setAutoCapture(true)
+        .setSmartFrame(true)
+        .build()
+        .prepareCamera(UnicoConfig(), this@MainActivity)
+}
 
 override fun onCameraReady(p0: UnicoCheckCameraOpener.Camera?) {
-        p0?.open(this)
-        Log.d(TAG, "onCameraReady")
-    }
+    p0?.open(this)
+    Log.d(TAG, "onCameraReady")
+}
 ```
 
-Em caso de sucesso, o objeto `ResultCamera` do método `onSuccessSelfie` retornará 2 atributos: <strong> base64</strong> e <strong>encrypted</strong>.
+> **Observação:** Em caso de sucesso, o objeto `ResultCamera` retornado pelo método `onSuccessSelfie` fornecerá os atributos **base64** e **encrypted**.
+>
+> - **base64:** Pode ser utilizado para exibir um preview da imagem no seu app.
+> - **encrypted:** Deve ser enviado na chamada das APIs REST do Unico Check. Para mais detalhes, consulte nossa [API Reference](https://www3.acesso.io/identity/services/v3/docs/).
 
-#### - `base64`: pode ser utilizado caso queira exibir um preview da imagem em seu app;
-#### - `encrypted`: deverá ser enviado na chamada de nossas APIs REST do <b>unico check</b>. Para mais informações detalhadas, visite nosso <a href='https://www3.acesso.io/identity/services/v3/docs/'>API Reference</a>.
+---
 
-## 📄 Captura de documentos
+## 📄 Captura de Documentos
 
-### 1️⃣ Inicializar nosso SDK
+### 1️⃣ Inicializar o SDK
 
-Na inicialização do SDK para captura de documentos são utilizadas exatamente os mesmos métodos <span style='font-size: 13px'>`onErrorUnico(UnicoError error), onUserClosedCameraManually(), onSystemClosedCameraTimeoutSession()`</span> e <span style='font-size: 13px'>`onSystemChangedTypeCameraTimeoutFaceInference()`</span> na [captura de selfie](#1️⃣-inicializar-nosso-sdk). 
+A inicialização do SDK para captura de documentos utiliza os mesmos métodos de callback da captura de selfie:  
+`onErrorUnico(UnicoError error)`, `onUserClosedCameraManually()`, `onSystemClosedCameraTimeoutSession()` e `onSystemChangedTypeCameraTimeoutFaceInference()`.
 
-### 2️⃣ Efetuar abertura de câmera
+---
 
-Para implementar os <i>listeners</i> para evento de câmera, o processo é exatamente igual a realizada na [captura de selfie](#4️⃣-efetuar-abertura-da-câmera). Porém, os métodos de callback de sucesso e erro são chamados desta forma: 
+### 2️⃣ Efetuar a Abertura da Câmera
+
+A configuração dos _listeners_ para os eventos da câmera é idêntica à realizada na captura de selfie, porém os métodos de callback de sucesso e erro são:
+
+```kotlin
+override fun onSuccessDocument(p0: ResultCamera?) { }
 ```
-override fun onSuccessDocument(p0: ResultCamera?) {}
+
+```kotlin
+override fun onErrorDocument(p0: String?) { }
 ```
-```
-override fun onErrorDocument(p0: String?) {}
-```
 
-Finalmente, devemos abrir a câmera com as configurações feitas até aqui. Chamamos o método `prepareDocumentCamera` e na sequência o método `open`. Este método receberá os parâmetros abaixo:
+Abra a câmera com as configurações definidas utilizando o método `prepareDocumentCamera` seguido de `open`. Esse método recebe os seguintes parâmetros:
 
-<b style='font-size: 15px'>Tipos de documentos a serem capturados, sendo eles: </b>
-- DocumentType.CNH: 
-- DocumentType.CNH_FRENTE: 
-- DocumentType.CNH_VERSO: 
-- DocumentType.CPF: 
-- DocumentType.RG_FRENTE: 
-- DocumentType.RG_VERSO: 
-- DocumentType.None: 
+- **Tipos de Documentos a Capturar:**
+  - `DocumentType.CNH`
+  - `DocumentType.CNH_FRENTE`
+  - `DocumentType.CNH_VERSO`
+  - `DocumentType.CPF`
+  - `DocumentType.RG_FRENTE`
+  - `DocumentType.RG_VERSO`
+  - `DocumentType.None`
 
-<b style='font-size: 15px'>Listeners configurados [acima](#2️⃣-efetuar-abertura-de-câmera)</b>
+- **Listeners:** Conforme configurados anteriormente.
 
-```
-  fun openCameraDocument(view: View){
-        AcessoBio(this, this)
-            .setAutoCapture(true)
-            .setSmartFrame(true)
-            .build()
-            .prepareDocumentCamera(UnicoConfig(), this@MainActivity)
-  }
+Exemplo:
 
-  override fun onCameraReady(p0: UnicoCheckCameraOpener.Document?) {
+```kotlin
+fun openCameraDocument(view: View){
+    AcessoBio(this, this)
+        .setAutoCapture(true)
+        .setSmartFrame(true)
+        .build()
+        .prepareDocumentCamera(UnicoConfig(), this@MainActivity)
+}
+
+override fun onCameraReady(p0: UnicoCheckCameraOpener.Document?) {
     p0?.open(DocumentType.CNH, this)
-  }
+}
 ```
 
-Em caso de sucesso, o objeto `ResultCamera` do método `onSuccessDocument` retornará 2 atributos (`base64` e `encrypted`) igualmente a [captura de selfie](#base64-pode-ser-utilizado-caso-queira-exibir-um-preview-da-imagem-em-seu-app).
+> **Observação:** Em caso de sucesso, o objeto `ResultCamera` retornado pelo método `onSuccessDocument` fornecerá os atributos **base64** e **encrypted**, assim como na captura de selfie.
 
-### 3️⃣ Customizar o frame de captura
+---
 
-<strong>Este passo é opcional, porém recomendado.</strong> Oferecemos a possibilidade de customização do frame de captura por meio do nosso SDK. Para customizar o frame, basta utilizar o método correspondente a propriedade a ser customizada, e posteriormente, aplicar o novo estilo através do método `setTheme()`. Para mais informações, consulte em nossa página de <a href='https://developers.unico.io/guias/android/referencias#customiza%C3%A7%C3%B5es'>Referências</a> do SDK.
+### 3️⃣ Customizar o Frame de Captura
+
+**Opcional, mas recomendado.**  
+Você pode customizar o frame de captura utilizando o método correspondente e aplicar o novo estilo através do método `setTheme()`.  
+Para mais informações, consulte as [Referências do SDK](https://developers.unico.io/guias/android/referencias#customiza%C3%A7%C3%B5es).
+
+---
 
 ## 🤔 Dúvidas
 
-Caso tenha alguma dúvida ou precise de ajuda com questões mais específicas, nossa <a href='https://developers.unico.io/guias/android/overview'>documentação</a> está disponível.
+Se você tiver alguma dúvida ou precisar de ajuda com questões específicas, nossa [documentação](https://developers.unico.io/guias/android/overview) está à disposição.
