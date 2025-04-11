@@ -12,6 +12,7 @@ import com.acesso.acessobio_android.onboarding.AcessoBio
 import com.acesso.acessobio_android.onboarding.camera.CameraListener
 import com.acesso.acessobio_android.onboarding.camera.UnicoCheckCameraOpener
 import com.acesso.acessobio_android.onboarding.camera.document.DocumentCameraListener
+import com.acesso.acessobio_android.onboarding.models.Environment
 import com.acesso.acessobio_android.onboarding.types.DocumentType
 import com.acesso.acessobio_android.services.dto.ErrorBio
 import com.acesso.acessobio_android.services.dto.ResultCamera
@@ -40,6 +41,7 @@ class MainActivity : AppCompatActivity(), AcessoBioListener,
             .setSmartFrame(false)
             .setTheme(this.unicoTheme)
             .setTimeoutSession(this.timeout)
+            .setEnvironment(Environment.UAT)
             .build()
             .prepareCamera(UnicoConfig(), this@MainActivity)
     }
@@ -50,6 +52,7 @@ class MainActivity : AppCompatActivity(), AcessoBioListener,
             .setSmartFrame(true)
             .setTheme(this.unicoTheme)
             .setTimeoutSession(this.timeout)
+            .setEnvironment(Environment.UAT)
             .build()
             .prepareCamera(UnicoConfig(), this@MainActivity)
     }
@@ -60,8 +63,9 @@ class MainActivity : AppCompatActivity(), AcessoBioListener,
             AcessoBio(this, this)
                 .setTheme(this.unicoTheme)
                 .setTimeoutSession(this.timeout)
+                .setEnvironment(Environment.UAT)
                 .build()
-                .prepareCamera(UnicoConfigLiveness(), this@MainActivity)
+                .prepareCamera(UnicoConfig(), this@MainActivity)
         } catch(e: Exception) {
             Log.e(TAG, e.toString())
         }
@@ -73,6 +77,7 @@ class MainActivity : AppCompatActivity(), AcessoBioListener,
             .setSmartFrame(true)
             .setTheme(this.unicoTheme)
             .setTimeoutSession(this.timeout)
+            .setEnvironment(Environment.UAT)
             .build()
             .prepareDocumentCamera(UnicoConfig(), this@MainActivity)
 
@@ -85,6 +90,7 @@ class MainActivity : AppCompatActivity(), AcessoBioListener,
             .setSmartFrame(true)
             .setTheme(this.unicoTheme)
             .setTimeoutSession(this.timeout)
+            .setEnvironment(Environment.UAT)
             .build()
             .prepareDocumentCamera(UnicoConfig(), this@MainActivity)
 
