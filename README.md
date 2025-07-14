@@ -28,6 +28,10 @@ Você pode conferir os aparelhos testados em nossos laboratórios nesta [lista d
 
 ---
 
+## ✨ Em caso de algum conflito de biblioteca com nossa SDK o caminho correto é sempre abrir um chamado em nossa plataforma oficial para o nosso time de Suporte.
+
+---
+
 ## ✨ Como Começar
 
 ### 🚀 Ambiente de Desenvolvimento & Credenciais Unico
