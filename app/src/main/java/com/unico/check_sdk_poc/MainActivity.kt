@@ -1,13 +1,15 @@
 package com.unico.check_sdk_poc
 
-import androidx.appcompat.app.AppCompatActivity
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.TextView
-import com.acesso.acessobio_android.AcessoBioListener
-import com.acesso.acessobio_android.iAcessoBioDocument
-import com.acesso.acessobio_android.iAcessoBioSelfie
+import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import com.acesso.acessobio_android.*
 import com.acesso.acessobio_android.onboarding.AcessoBio
 import com.acesso.acessobio_android.onboarding.camera.CameraListener
 import com.acesso.acessobio_android.onboarding.camera.UnicoCheckCameraOpener
@@ -17,141 +19,205 @@ import com.acesso.acessobio_android.onboarding.types.DocumentType
 import com.acesso.acessobio_android.services.dto.ErrorBio
 import com.acesso.acessobio_android.services.dto.ResultCamera
 
-var TAG = "MainActivity"
+class MainActivity : AppCompatActivity(),
+    AcessoBioListener,
+    iAcessoBioSelfie,
+    CameraListener,
+    iAcessoBioDocument,
+    DocumentCameraListener {
 
-class MainActivity : AppCompatActivity(), AcessoBioListener,
-    iAcessoBioSelfie, CameraListener,
-    iAcessoBioDocument, DocumentCameraListener {
-
-    lateinit var textField: TextView
-    lateinit var documentType: DocumentType
-    val unicoTheme = UnicoTheme()
-    val timeout = 50.0
+    private lateinit var textField: TextView
+    private lateinit var logTextView: TextView
+    private lateinit var logScrollView: ScrollView
+    private lateinit var documentType: DocumentType
+    private val unicoTheme = UnicoTheme()
+    private val timeout = 50.0
+    private val CAMERA_PERMISSION_CODE = 1001
+    private val TAG = "MainActivity"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         textField = findViewById(R.id.mainText)
-    }
+        logTextView = findViewById(R.id.logTextView)
+        logScrollView = findViewById(R.id.logScrollView)
 
-    fun openCameraManual(view : View){
-        AcessoBio(this, this)
-            .setAutoCapture(false)
-            .setSmartFrame(false)
-            .setTheme(this.unicoTheme)
-            .setTimeoutSession(this.timeout)
-            .setEnvironment(Environment.UAT)
-            .build()
-            .prepareCamera(UnicoConfig(), this@MainActivity)
-    }
-
-    fun openCameraSmart(view: View){
-        AcessoBio(this, this)
-            .setAutoCapture(true)
-            .setSmartFrame(true)
-            .setTheme(this.unicoTheme)
-            .setTimeoutSession(this.timeout)
-            .setEnvironment(Environment.UAT)
-            .build()
-            .prepareCamera(UnicoConfig(), this@MainActivity)
-    }
-
-    fun openCameraLiveness(view: View){
-        Log.d(TAG, "openCameraLiveness")
-        try {
-            AcessoBio(this, this)
-                .setTheme(this.unicoTheme)
-                .setTimeoutSession(this.timeout)
-                .setEnvironment(Environment.UAT)
-                .build()
-                .prepareCamera(UnicoConfig(), this@MainActivity)
-        } catch(e: Exception) {
-            Log.e(TAG, e.toString())
+        findViewById<Button>(R.id.clearLogButton).setOnClickListener {
+            logTextView.text = ""
+            addLog("Log limpo.")
         }
     }
 
-    fun openCameraDocumentCNHFront(view: View){
+    private fun addLog(message: String) {
+        runOnUiThread {
+
+            logTextView.append("\n$message")
+            logScrollView.post {
+                logScrollView.fullScroll(View.FOCUS_DOWN)
+            }
+        }
+        Log.d(TAG, message)
+    }
+
+
+
+    fun openCameraManual(view: View) {
+        addLog("openCameraManual chamado")
+        AcessoBio(this, this)
+            .setAutoCapture(false)
+            .setSmartFrame(false)
+            .setTheme(unicoTheme)
+            .setTimeoutSession(timeout)
+            .setEnvironment(Environment.UAT)
+            .build()
+            .prepareCamera(UnicoConfig(), this)
+    }
+
+    fun openCameraSmart(view: View) {
+        addLog("openCameraSmart chamado")
         AcessoBio(this, this)
             .setAutoCapture(true)
             .setSmartFrame(true)
-            .setTheme(this.unicoTheme)
-            .setTimeoutSession(this.timeout)
+            .setTheme(unicoTheme)
+            .setTimeoutSession(timeout)
             .setEnvironment(Environment.UAT)
             .build()
-            .prepareDocumentCamera(UnicoConfig(), this@MainActivity)
+            .prepareCamera(UnicoConfig(), this)
+    }
 
+    fun openCameraLiveness(view: View) {
+        addLog("openCameraLiveness chamado")
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+            == PackageManager.PERMISSION_GRANTED) {
+            startCameraLiveness()
+        } else {
+            addLog("Solicitando permissão de câmera...")
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.CAMERA),
+                CAMERA_PERMISSION_CODE
+            )
+        }
+    }
+
+    private fun startCameraLiveness() {
+        addLog("Permissão de câmera concedida. Iniciando SDK Liveness.")
+        try {
+            AcessoBio(this, this)
+                .setTheme(unicoTheme)
+                .setTimeoutSession(timeout)
+                .setEnvironment(Environment.UAT)
+                .build()
+                .prepareCamera(UnicoConfig(), this)
+        } catch (e: Exception) {
+            addLog("Erro no startCameraLiveness: ${e.message}")
+        }
+    }
+
+    fun openCameraDocumentCNHFront(view: View) {
+        addLog("openCameraDocumentCNHFront chamado")
         documentType = DocumentType.CNH_FRENTE
-    }
-
-    fun openCameraDocumentCNHBack(view: View){
         AcessoBio(this, this)
             .setAutoCapture(true)
             .setSmartFrame(true)
-            .setTheme(this.unicoTheme)
-            .setTimeoutSession(this.timeout)
+            .setTheme(unicoTheme)
+            .setTimeoutSession(timeout)
             .setEnvironment(Environment.UAT)
             .build()
-            .prepareDocumentCamera(UnicoConfig(), this@MainActivity)
-
-        documentType = DocumentType.CNH_VERSO
+            .prepareDocumentCamera(UnicoConfig(), this)
     }
 
-    override fun onErrorAcessoBio(p0: ErrorBio?) {
-        var message = p0.toString()
-        Log.e(TAG, message)
-        textField.text = message
+    fun openCameraDocumentCNHBack(view: View) {
+        addLog("openCameraDocumentCNHBack chamado")
+        documentType = DocumentType.CNH_VERSO
+        AcessoBio(this, this)
+            .setAutoCapture(true)
+            .setSmartFrame(true)
+            .setTheme(unicoTheme)
+            .setTimeoutSession(timeout)
+            .setEnvironment(Environment.UAT)
+            .build()
+            .prepareDocumentCamera(UnicoConfig(), this)
+    }
+
+    // Permissive
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == CAMERA_PERMISSION_CODE) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                addLog("Permissão da câmera concedida.")
+                startCameraLiveness()
+            } else {
+                addLog("Permissão da câmera negada pelo usuário.")
+                Toast.makeText(this, "Permissão da câmera é obrigatória para continuar.", Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    // ----------- CALLBACKS SDK ------------
+    override fun onErrorAcessoBio(error: ErrorBio?) {
+        addLog("Erro AcessoBio: ${error.toString()}")
+        textField.text = error.toString()
     }
 
     override fun onUserClosedCameraManually() {
-        Log.d(TAG, "onUserClosedCameraManually")
+        addLog("Usuário fechou a câmera manualmente.")
         textField.text = "Camera fechada manualmente."
     }
 
     override fun onSystemClosedCameraTimeoutSession() {
-        Log.d(TAG, "onSystemClosedCameraTimeoutSession")
-        textField.text = "Tempo de sessao excedido."
+        addLog("Sessão encerrada por timeout.")
+        textField.text = "Tempo de sessão excedido."
     }
 
     override fun onSystemChangedTypeCameraTimeoutFaceInference() {
-        Log.d(TAG, "onSystemChangedTypeCameraTimeoutFaceInference")
-        textField.text = "Tempo de inferencia inteligente de face excedido."
+        addLog("Timeout de inferência de face.")
+        textField.text = "Tempo de inferência excedido."
     }
 
-    override fun onSuccessSelfie(p0: ResultCamera?) {
-        Log.d(TAG, "onSuccessSelfie")
-        textField.text = "Selfie capturada com sucesso"
+    override fun onSuccessSelfie(result: ResultCamera) {
+        addLog("Selfie capturada com sucesso.")
+        textField.text = "Selfie capturada com sucesso."
+
+        addLog("JWT da selfie capturado com sucesso.")
+
+         Log.d(TAG, "JWT COMPLETO DA SELFIE: ${result.encrypted}") // Descomente para depuração
     }
 
-    override fun onErrorSelfie(p0: ErrorBio?) {
-        var message = p0.toString()
-        Log.e(TAG, message)
-        textField.text = message
+    override fun onErrorSelfie(error: ErrorBio?) {
+        addLog("Erro na selfie: ${error.toString()}")
+        textField.text = error.toString()
     }
 
-    override fun onCameraReady(p0: UnicoCheckCameraOpener.Document?) {
-        p0?.open(documentType, this)
-    }
-
-    override fun onCameraFailed(p0: String?) {
-        if (p0 != null) {
-            Log.e(TAG, p0)
-            textField.text = p0
-        }
+    override fun onCameraReady(document: UnicoCheckCameraOpener.Document?) {
+        addLog("DocumentCamera pronto.")
+        document?.open(documentType, this)
     }
 
     override fun onCameraReady(cameraOpener: UnicoCheckCameraOpener.Camera) {
-        cameraOpener?.open(this)
-        Log.d(TAG, "onCameraReady")
+        addLog("Camera pronta.")
+        cameraOpener.open(this)
     }
 
-    override fun onSuccessDocument(p0: ResultCamera?) {
-        Log.d(TAG, "onSuccessDocument")
-        textField.text = "Documento capturado com sucesso"
+    override fun onCameraFailed(error: String?) {
+        addLog("Falha na câmera: $error")
+        textField.text = error
     }
 
-    override fun onErrorDocument(p0: String?) {
-        Log.e(TAG, p0.toString())
-        textField.text = p0
+    override fun onSuccessDocument(result: ResultCamera?) {
+        addLog("Documento capturado com sucesso.")
+        textField.text = "Documento capturado com sucesso."
+        result?.encrypted?.let {
+
+            addLog("JWT do documento capturado com sucesso.")
+            // Se precisar do valor do JWT para depuração, use Log.d(TAG, it) aqui.
+             Log.d(TAG, "JWT COMPLETO DO DOCUMENTO: $it") // Descomente para depuração
+        }
+    }
+
+    override fun onErrorDocument(error: String?) {
+        addLog("Erro no documento: $error")
+        textField.text = error
     }
 }
