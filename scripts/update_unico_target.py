@@ -74,8 +74,6 @@ if not match:
 
 current_version = match.group(2) # Captura o segundo grupo, que é o número da versão
 
-
-
 if current_version != site_version:
     print(f"✅ Atualizando {DEPENDENCY_NAME} de {current_version} para {site_version}...")
 
