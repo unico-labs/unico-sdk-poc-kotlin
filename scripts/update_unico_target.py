@@ -64,9 +64,7 @@ try:
 except FileNotFoundError:
     raise FileNotFoundError(f"❌ O arquivo '{full_file_path}' não foi encontrado.")
 
-# Regex melhorada para ser mais robusta.
-# Procura pela dependência e captura a versão, tratando aspas simples ou duplas.
-dependency_pattern = re.compile(rf"compileSdkVersion\s+(['\"]?{DEPENDENCY_NAME}['\"]?):['\"]?([\d\.]+)['\"]?", re.DOTALL)
+dependency_pattern = re.compile(rf'^\s*implementation\s+["\']{DEPENDENCY_NAME}:([\d.]+)["\']', re.MULTILINE)
 match = dependency_pattern.search(content)
 
 if not match:
