@@ -38,7 +38,6 @@ version_pattern = re.compile(r"Versão\s*([\d.]+)\s*​\s*-\s*\s*(\d{2}/\d{2}/\d
 match = "";
 for div in divs:
     text_content = div.get_text(strip=True)
-    print(text_content)
     match = version_pattern.search(text_content)
     if match:
         site_version = match.group(1)
@@ -87,7 +86,7 @@ if current_version != site_version:
 
     try:
     # --- Automação Git e GitHub ---
-        branch = f"chore/update-{DEPENDENCY_NAME}-v{site_version}"
+        branch = f"chore/update-sdk-v{site_version}"
         tag = f"v{site_version}"
         commit_message = f"chore: bump {DEPENDENCY_NAME} to v{site_version}"
 
