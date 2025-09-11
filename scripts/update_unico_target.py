@@ -70,7 +70,7 @@ match = dependency_pattern.search(content)
 if not match:
     raise ValueError(f"❌ Dependência '{DEPENDENCY_NAME}' não encontrada no arquivo.")
 
-current_version = match.group(2) # Captura o segundo grupo, que é o número da versão
+current_version = match.group(1)
 
 if current_version != site_version:
     print(f"✅ Atualizando {DEPENDENCY_NAME} de {current_version} para {site_version}...")
