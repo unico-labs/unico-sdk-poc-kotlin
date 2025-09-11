@@ -99,7 +99,7 @@ if current_version != site_version:
         subprocess.run(["git", "commit", "-m", commit_message], check=True)
         subprocess.run(["git", "push", "origin", branch], check=True)
 
-        tag_message = f"Release {DEPENDENCY_NAME} {site_version} ({release_date})"
+        tag_message = f"Release V {site_version} ({release_date})"
             
         subprocess.run(["git", "tag", "-a", tag, "-m", tag_message], check=True)
         subprocess.run(["git", "push", "origin", tag], check=True)
