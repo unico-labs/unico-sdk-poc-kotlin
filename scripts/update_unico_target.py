@@ -7,101 +7,93 @@ import os
 # ===============================
 # Settings
 # ===============================
-
 URL = "https://devcenter.unico.io/idcloud/integracao/sdk/integracao-sdks/sdk-android/release-notes"
-DEPENDENCY_NAME = "io.unico:capture"
-FILE_TO_UPDATE = "app/build.gradle"
-
-script_dir = os.path.dirname(os.path.abspath(__file__))
-REPO_PATH = os.path.abspath(os.path.join(script_dir, '..'))
+DEPENDENCY_GROUP = "io.unico"
+DEPENDENCY_ARTIFACT = "capture"
+REPO_PATH = "."  # Path to the local repository
 
 # ===============================
 # Step 1: Fetch version and release date from the website
 # ===============================
-print("🔎 Fetching latest version from Unico's release notes...")
 response = requests.get(URL)
 soup = BeautifulSoup(response.text, "html.parser")
 
+spans = soup.find_all("span")
 site_version = None
 release_date = None
 
-version_pattern = re.compile(r"Versão\s*([\d.]+)\s*-\s*(\d{2}/\d{2}/\d{4})")
-
-divs = soup.find_all("div")
-for div in divs:
-    text_content = div.get_text(strip=True)
-    match = version_pattern.search(text_content)
+for span in spans:
+    text_content = span.get_text(strip=True).replace("\u200b", "")
+    match = re.search(r"Versão\s*([\d.]+)\s*-\s*(\d{2}/\d{2}/\d{4})", text_content)
     if match:
         site_version = match.group(1)
         release_date = match.group(2)
         break
 
 if not site_version:
-    print("❌ Could not capture the version from the website. Check the HTML structure or regex.")
-    exit(1)
+    print("❌ Could not capture the version from the website")
+    exit(0)
 
 print(f"📦 Latest version on the website: {site_version}")
 print(f"🗓️ Release date: {release_date}")
 
 # ===============================
-# Step 2: Read and update the gradle file
+# Step 2: Read build.gradle from the target repository
 # ===============================
-full_file_path = os.path.join(REPO_PATH, FILE_TO_UPDATE)
+gradle_path = os.path.join(REPO_PATH, "build.gradle")
+with open(gradle_path, "r", encoding="utf-8") as f:
+    lines = f.readlines()
 
-try:
-    with open(full_file_path, "r", encoding="utf-8") as f:
-        content = f.read()
-except FileNotFoundError:
-    print(f"❌ O arquivo '{full_file_path}' não foi encontrado.")
-    exit(1)
+current_version = None
+dependency_pattern = re.compile(rf'implementation\s+"{DEPENDENCY_GROUP}:{DEPENDENCY_ARTIFACT}:(.*?)"')
 
-dependency_pattern = re.compile(rf'(implementation\s+["\']{DEPENDENCY_NAME}:)([\d.]+)["\']', re.MULTILINE)
-match = dependency_pattern.search(content)
+for line in lines:
+    match = dependency_pattern.search(line)
+    if match:
+        current_version = match.group(1)
+        break
 
-if not match:
-    print(f"❌ Dependência '{DEPENDENCY_NAME}' não encontrada no arquivo.")
-    exit(1)
+print(f"📂 Current version in build.gradle: {current_version}")
 
-current_version = match.group(2)
-print(f"✅ Current version in {FILE_TO_UPDATE}: {current_version}")
-
+# ===============================
+# Step 3: Update dependency if necessary
+# ===============================
 if current_version != site_version:
-    print(f"⬆️ New version found! Updating from {current_version} to {site_version}.")
+    new_lines = []
+    for line in lines:
+        if dependency_pattern.search(line):
+            new_lines.append(f'    implementation "{DEPENDENCY_GROUP}:{DEPENDENCY_ARTIFACT}:{site_version}"\n')
+        else:
+            new_lines.append(line)
 
-    new_content = dependency_pattern.sub(rf"\g<1>{site_version}'", content, count=1)
+    with open(gradle_path, "w", encoding="utf-8") as f:
+        f.writelines(new_lines)
 
-    with open(full_file_path, "w", encoding="utf-8") as f:
-        f.write(new_content)
-    print(f"🎉 File '{FILE_TO_UPDATE}' was successfully updated!")
+    print(f"✅ Updated {DEPENDENCY_GROUP}:{DEPENDENCY_ARTIFACT} to version {site_version}")
 
-    # ===============================
-    # Step 3: Create branch, commit, and Pull Request
-    # ===============================
- 
-    branch = f"update-{DEPENDENCY_NAME.replace(':', '-')}-v{site_version}"
-    tag = f"v{site_version}" 
+    branch = f"update-{DEPENDENCY_ARTIFACT}-v{site_version}"
+    tag = f"{DEPENDENCY_ARTIFACT}-v{site_version}"
 
-    print(f"🌿 Creating branch '{branch}'...")
+    # Create branch, commit, and push changes
     subprocess.run(["git", "checkout", "-b", branch], check=True)
     subprocess.run(["git", "config", "user.name", "github-actions"], check=True)
     subprocess.run(["git", "config", "user.email", "github-actions@github.com"], check=True)
-    
-    subprocess.run(["git", "add", full_file_path], check=True)
-    
-    commit_message = f"chore: bump {DEPENDENCY_NAME} to v{site_version}"
-    subprocess.run(["git", "commit", "-m", commit_message], check=True)
-    subprocess.run(["git", "push", "--set-upstream", "origin", branch], check=True)
+    subprocess.run(["git", "add", "build.gradle"], check=True)
+    subprocess.run(["git", "commit", "-m", f"chore: bump {DEPENDENCY_ARTIFACT} to v{site_version}"], check=True)
+    subprocess.run(["git", "push", "origin", branch], check=True)
 
-    print(f"🔖 Creating tag '{tag}'...")
-    subprocess.run(["git", "tag", "-a", tag, "-m", f"Release {DEPENDENCY_NAME} {site_version} ({release_date})"], check=True)
+    # Create git tag and push it
+    subprocess.run(["git", "tag", "-a", tag, "-m", f"Release {DEPENDENCY_ARTIFACT} {site_version} ({release_date})"], check=True)
     subprocess.run(["git", "push", "origin", tag], check=True)
 
-    print("🚀 Creating Pull Request...")
-    body = f"Automatic update of `{DEPENDENCY_NAME}` to version **{site_version}**.\n\n📅 Release date: **{release_date}**\n🔗 [Official Release Notes]({URL})"
+    # Create Pull Request using GitHub CLI
+    body = f"""
+    Automatic update of `{DEPENDENCY_GROUP}:{DEPENDENCY_ARTIFACT}` to version **{site_version}** 📅 Release date: **{release_date}** 🔗 [Official Release Notes]({URL})
+    """
 
     pr_process = subprocess.run([
         "gh", "pr", "create",
-        "--title", f"Update {DEPENDENCY_NAME} to v{site_version}",
+        "--title", f"Update {DEPENDENCY_ARTIFACT} to v{site_version}",
         "--body", body,
         "--head", branch
     ], check=True, capture_output=True, text=True)
@@ -111,11 +103,13 @@ if current_version != site_version:
 
     if "GITHUB_OUTPUT" in os.environ:
         with open(os.environ["GITHUB_OUTPUT"], "a") as f:
-            print(f"updated=true", file=f, flush=True)
-            print(f"new_version={site_version}", file=f, flush=True)
-            print(f"pr_url={pr_url}", file=f, flush=True)
+            print(f"updated=true", file=f)
+            print(f"new_version={site_version}", file=f)
+            print(f"release_date={release_date}", file=f)
+            print(f"pr_url={pr_url}", file=f)
+
 else:
     print("🔄 Already at the latest version, nothing to do.")
     if "GITHUB_OUTPUT" in os.environ:
         with open(os.environ["GITHUB_OUTPUT"], "a") as f:
-            print(f"updated=false", file=f, flush=True)
+            print(f"updated=false", file=f)
