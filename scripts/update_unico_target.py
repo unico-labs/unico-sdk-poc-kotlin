@@ -78,7 +78,7 @@ if current_version != site_version:
     subprocess.run(["git", "checkout", "-b", branch], check=True)
     subprocess.run(["git", "config", "user.name", "github-actions"], check=True)
     subprocess.run(["git", "config", "user.email", "github-actions@github.com"], check=True)
-    subprocess.run(["git", "add", "build.gradle"], check=True)
+    subprocess.run(["git", "add", gradle_path], check=True)
     subprocess.run(["git", "commit", "-m", f"chore: bump {DEPENDENCY_ARTIFACT} to v{site_version}"], check=True)
     subprocess.run(["git", "push", "origin", branch], check=True)
 
