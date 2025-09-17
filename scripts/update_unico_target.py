@@ -40,7 +40,7 @@ print(f"🗓️ Release date: {release_date}")
 # ===============================
 # Step 2: Read build.gradle from the target repository
 # ===============================
-gradle_path = os.path.join(REPO_PATH, "build.gradle")
+gradle_path = os.path.join(REPO_PATH, "app", "build.gradle")
 with open(gradle_path, "r", encoding="utf-8") as f:
     lines = f.readlines()
 
