@@ -7,35 +7,27 @@ import os
 # ===============================
 # Settings
 # ===============================
+
 URL = "https://devcenter.unico.io/idcloud/integracao/sdk/integracao-sdks/sdk-android/release-notes"
 DEPENDENCY_NAME = "io.unico:capture"
-REPO_PATH = "." # Diretório do repositório local
 FILE_TO_UPDATE = "app/build.gradle"
 
-# Função para dar pull caso já exista algum repositório criado.
-def doPullRequest(branch_name): 
-    try:
-        print("EXECUTANDO O COMANDO PULL --REBASE ORIGIN !")
-        subprocess.run(["git", "pull", "--rebase", "origin", branch_name], check=True)
-    except subprocess.CalledProcessError as e:
-            # If pull fails, it means the branch is new, so we continue without pulling.
-            print(f"Branch does not exist on remote. Proceeding with initial push.")
-
+script_dir = os.path.dirname(os.path.abspath(__file__))
+REPO_PATH = os.path.abspath(os.path.join(script_dir, '..'))
 
 # ===============================
-# 1️⃣ Buscar versão + data no site
+# Step 1: Fetch version and release date from the website
 # ===============================
 print("🔎 Fetching latest version from Unico's release notes...")
 response = requests.get(URL)
 soup = BeautifulSoup(response.text, "html.parser")
 
-divs = soup.find_all("div") # Busca todas as divs para encontrar a que tem a versão
 site_version = None
 release_date = None
 
-# Regex para encontrar o padrão "Versão X.X.X - DD/MM/YYYY"
-version_pattern = re.compile(r"Versão\s*([\d.]+)\s*​\s*-\s*\s*(\d{2}/\d{2}/\d{4})")
-match = "";
+version_pattern = re.compile(r"Versão\s*([\d.]+)\s*-\s*(\d{2}/\d{2}/\d{4})")
+
+divs = soup.find_all("div")
 for div in divs:
     text_content = div.get_text(strip=True)
     match = version_pattern.search(text_content)
@@ -45,83 +37,85 @@ for div in divs:
         break
 
 if not site_version:
-    print("❌ Could not capture the version from the website. Check the HTML structure.")
+    print("❌ Could not capture the version from the website. Check the HTML structure or regex.")
     exit(1)
 
 print(f"📦 Latest version on the website: {site_version}")
 print(f"🗓️ Release date: {release_date}")
 
-print(f"📖 Reading and updating {FILE_TO_UPDATE} file...")
-
-# Cria o caminho completo do arquivo para o projeto Kotlin
-# O uso de os.path.join garante que o caminho seja construído corretamente em qualquer OS.
+# ===============================
+# Step 2: Read and update the gradle file
+# ===============================
 full_file_path = os.path.join(REPO_PATH, FILE_TO_UPDATE)
 
 try:
     with open(full_file_path, "r", encoding="utf-8") as f:
         content = f.read()
 except FileNotFoundError:
-    raise FileNotFoundError(f"❌ O arquivo '{full_file_path}' não foi encontrado.")
+    print(f"❌ O arquivo '{full_file_path}' não foi encontrado.")
+    exit(1)
 
-dependency_pattern = re.compile(rf'^\s*implementation\s+["\']{DEPENDENCY_NAME}:([\d.]+)["\']', re.MULTILINE)
+dependency_pattern = re.compile(rf'(implementation\s+["\']{DEPENDENCY_NAME}:)([\d.]+)["\']', re.MULTILINE)
 match = dependency_pattern.search(content)
 
 if not match:
-    raise ValueError(f"❌ Dependência '{DEPENDENCY_NAME}' não encontrada no arquivo.")
+    print(f"❌ Dependência '{DEPENDENCY_NAME}' não encontrada no arquivo.")
+    exit(1)
 
-current_version = match.group(1)
+current_version = match.group(2)
+print(f"✅ Current version in {FILE_TO_UPDATE}: {current_version}")
 
 if current_version != site_version:
-    print(f"✅ Atualizando {DEPENDENCY_NAME} de {current_version} para {site_version}...")
+    print(f"⬆️ New version found! Updating from {current_version} to {site_version}.")
 
-    # Substitui a versão antiga pela nova usando re.sub
-    new_content = dependency_pattern.sub(f"{DEPENDENCY_NAME}:{site_version}", content)
+    new_content = dependency_pattern.sub(rf"\g<1>{site_version}'", content, count=1)
 
-    try:
-        with open(FILE_TO_UPDATE, "w", encoding="utf-8") as f:
-            f.write(new_content)
-        print(f"🎉 O arquivo '{FILE_TO_UPDATE}' foi atualizado com sucesso!")
-    except IOError as e:
-        raise IOError(f"❌ Erro ao escrever no arquivo '{FILE_TO_UPDATE}': {e}")
+    with open(full_file_path, "w", encoding="utf-8") as f:
+        f.write(new_content)
+    print(f"🎉 File '{FILE_TO_UPDATE}' was successfully updated!")
 
-    try:
-    # --- Automação Git e GitHub ---
-        branch = f"chore/update-sdk-v{site_version}"
-        tag = f"v{site_version}"
-        commit_message = f"chore: bump {DEPENDENCY_NAME} to v{site_version}"
+    # ===============================
+    # Step 3: Create branch, commit, and Pull Request
+    # ===============================
+ 
+    branch = f"update-{DEPENDENCY_NAME.replace(':', '-')}-v{site_version}"
+    tag = f"v{site_version}" 
 
-        print("🤖 Starting Git automation...")
-        subprocess.run(["git", "checkout", "-b", branch], check=True)
-        subprocess.run(["git", "config", "user.name", "github-actions"], check=True)
-        subprocess.run(["git", "config", "user.email", "github-actions@github.com"], check=True)
-        subprocess.run(["git", "add", FILE_TO_UPDATE], check=True)
-        subprocess.run(["git", "commit", "-m", commit_message], check=True)
-        subprocess.run(["git", "push", "origin", branch], check=True)
+    print(f"🌿 Creating branch '{branch}'...")
+    subprocess.run(["git", "checkout", "-b", branch], check=True)
+    subprocess.run(["git", "config", "user.name", "github-actions"], check=True)
+    subprocess.run(["git", "config", "user.email", "github-actions@github.com"], check=True)
+    
+    subprocess.run(["git", "add", full_file_path], check=True)
+    
+    commit_message = f"chore: bump {DEPENDENCY_NAME} to v{site_version}"
+    subprocess.run(["git", "commit", "-m", commit_message], check=True)
+    subprocess.run(["git", "push", "--set-upstream", "origin", branch], check=True)
 
-        tag_message = f"Release V {site_version} ({release_date})"
-            
-        subprocess.run(["git", "tag", "-a", tag, "-m", tag_message], check=True)
-        subprocess.run(["git", "push", "origin", tag], check=True)
+    print(f"🔖 Creating tag '{tag}'...")
+    subprocess.run(["git", "tag", "-a", tag, "-m", f"Release {DEPENDENCY_NAME} {site_version} ({release_date})"], check=True)
+    subprocess.run(["git", "push", "origin", tag], check=True)
 
-        pr_body = f"""
-        ### 🚀 Automatic Update
-        Bumps `{DEPENDENCY_NAME}` from `{current_version}` to version **{site_version}**.
-        
-        - 📅 **Release date**: {release_date}
-        - 🔗 **Official Release Notes**: [{URL}]({URL})
-        """
+    print("🚀 Creating Pull Request...")
+    body = f"Automatic update of `{DEPENDENCY_NAME}` to version **{site_version}**.\n\n📅 Release date: **{release_date}**\n🔗 [Official Release Notes]({URL})"
 
-        subprocess.run([
-            "gh", "pr", "create",
-            "--title", commit_message,
-            "--body", pr_body,
-            "--head", branch,
-            "--base", "main" # Altere 'main' para sua branch principal se for outra
-        ], check=True)
+    pr_process = subprocess.run([
+        "gh", "pr", "create",
+        "--title", f"Update {DEPENDENCY_NAME} to v{site_version}",
+        "--body", body,
+        "--head", branch
+    ], check=True, capture_output=True, text=True)
 
-        print(f"🎉 Successfully created branch, tag, and Pull Request for version {site_version}!")
+    pr_url = pr_process.stdout.strip()
+    print(f"✅ Pull Request created: {pr_url}")
 
-    except subprocess.CalledProcessError as e:
-            raise RuntimeError(f"❌ Erro em um comando Git/GitHub CLI: {e}")
+    if "GITHUB_OUTPUT" in os.environ:
+        with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+            print(f"updated=true", file=f, flush=True)
+            print(f"new_version={site_version}", file=f, flush=True)
+            print(f"pr_url={pr_url}", file=f, flush=True)
 else:
     print("🔄 Already at the latest version, nothing to do.")
+    if "GITHUB_OUTPUT" in os.environ:
+        with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+            print(f"updated=false", file=f, flush=True)
