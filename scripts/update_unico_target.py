@@ -16,26 +16,34 @@ REPO_PATH = "."  # Path to the local repository
 # ===============================
 # Step 1: Fetch version, date and release notes from the website
 # ===============================
+print("🔎 Fetching latest version from Unico's Android release notes...")
 response = requests.get(URL)
 soup = BeautifulSoup(response.text, "html.parser")
 
 site_version = None
 release_date = None
 release_notes = []
+header = None
 
-# Localiza o cabeçalho da versão mais recente
-header = soup.find(lambda tag: tag.name in ["h2", "h3", "h4", "div"] and "Versão" in tag.get_text())
+# Procura pelo primeiro cabeçalho <h3> que contém o texto "Versão"
+# Isso é mais específico e garante que pegamos o título da release mais recente
+for h3 in soup.find_all("h3"):
+    if "Versão" in h3.get_text():
+        header = h3
+        break # Para no primeiro que encontrar, que é o mais recente
 
 if header:
-    match = re.search(r"Versão\s*([\d.]+)\s*-\s*(\d{2}/\d{2}/\d{4})", header.get_text())
+    # CORREÇÃO APLICADA AQUI: Adicionado ".*?" para ignorar caracteres invisíveis
+    match = re.search(r"Versão\s*([\d.]+)\s*.*?\s*-\s*(\d{2}/\d{2}/\d{4})", header.get_text())
     if match:
         site_version = match.group(1)
         release_date = match.group(2)
 
-    # Busca o bloco de notas (ul com classes que contêm 'space-y-2')
-    notes_block = header.find_next("ul", class_=lambda x: x and "space-y-2" in x)
+    # A partir do cabeçalho encontrado, busca a próxima lista <ul> com as notas
+    notes_block = header.find_next_sibling("ul", class_=lambda x: x and "space-y-2" in x)
 
     if notes_block:
+        # Extrai o texto de cada parágrafo <p> dentro de um item da lista <li>
         for li in notes_block.find_all("li"):
             note_p = li.find("p")
             if note_p:
@@ -48,7 +56,12 @@ if header:
 # ===============================
 if not site_version:
     print("❌ Could not capture the version from the website")
-    exit(0)
+    # Se ainda houver notas, vamos exibi-las para depuração
+    if release_notes:
+        print("\n📝 Release notes were found, but the version header failed to parse:")
+        for note in release_notes:
+            print(f"- {note}")
+    exit(1) # Use exit(1) para sinalizar um erro
 
 print(f"📦 Latest version on the website: {site_version}")
 print(f"🗓️ Release date: {release_date}")
