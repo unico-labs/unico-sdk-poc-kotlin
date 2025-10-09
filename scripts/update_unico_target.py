@@ -156,14 +156,17 @@ if current_version != site_version:
 
     pr_url = pr_process.stdout.strip()
     print(f"🎉 Pull Request created: {pr_url}")
+    github_output = os.getenv("GITHUB_OUTPUT")
 
-    if "GITHUB_OUTPUT" in os.environ:
-        with open(os.environ["GITHUB_OUTPUT"], "a") as f:
-            print(f"updated=true", file=f)
-            print(f"new_version={site_version}", file=f)
-            print(f"release_date={release_date}", file=f)
-            print(f"release_notes={notes_formatted}", file=f)
-            print(f"pr_url={pr_url}", file=f)
+    if github_output:
+        with open(github_output, "a") as f:
+            f.write(f"updated=true\n")
+            f.write(f"new_version={site_version}\n")
+            f.write(f"release_date={release_date}\n")
+            f.write(f"pr_url={pr_url}\n")
+            f.write("release_notes<<EOF\n")
+            f.write(f"{notes_formatted}\n")
+            f.write("EOF\n")
 
 else:
     print("🔄 Already at the latest version, nothing to do.")
