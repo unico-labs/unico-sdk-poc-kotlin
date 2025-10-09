@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import re
 import subprocess
 import os
+import time
 
 # ===============================
 # Settings
@@ -13,23 +14,38 @@ DEPENDENCY_ARTIFACT = "capture"
 REPO_PATH = "."  # Path to the local repository
 
 # ===============================
-# Step 1: Fetch version and release date from the website
+# Step 1: Fetch version, date and release notes from the website
 # ===============================
 response = requests.get(URL)
 soup = BeautifulSoup(response.text, "html.parser")
 
-spans = soup.find_all("span")
 site_version = None
 release_date = None
+release_notes = []
 
-for span in spans:
-    text_content = span.get_text(strip=True).replace("\u200b", "")
-    match = re.search(r"Versão\s*([\d.]+)\s*-\s*(\d{2}/\d{2}/\d{4})", text_content)
+# Localiza o cabeçalho da versão mais recente
+header = soup.find(lambda tag: tag.name in ["h2", "h3", "h4", "div"] and "Versão" in tag.get_text())
+
+if header:
+    match = re.search(r"Versão\s*([\d.]+)\s*-\s*(\d{2}/\d{2}/\d{4})", header.get_text())
     if match:
         site_version = match.group(1)
         release_date = match.group(2)
-        break
 
+    # Busca o bloco de notas (ul com classes que contêm 'space-y-2')
+    notes_block = header.find_next("ul", class_=lambda x: x and "space-y-2" in x)
+
+    if notes_block:
+        for li in notes_block.find_all("li"):
+            note_p = li.find("p")
+            if note_p:
+                text = note_p.get_text(strip=True)
+                if text:
+                    release_notes.append(text)
+
+# ===============================
+# Step 2: Validate extracted data
+# ===============================
 if not site_version:
     print("❌ Could not capture the version from the website")
     exit(0)
@@ -37,8 +53,15 @@ if not site_version:
 print(f"📦 Latest version on the website: {site_version}")
 print(f"🗓️ Release date: {release_date}")
 
+if release_notes:
+    print("\n📝 Release notes found:")
+    for note in release_notes:
+        print(f"- {note}")
+else:
+    print("⚠️ No release notes found on the page.")
+
 # ===============================
-# Step 2: Read build.gradle from the target repository
+# Step 3: Read build.gradle from the target repository
 # ===============================
 gradle_path = os.path.join(REPO_PATH, "app", "build.gradle")
 with open(gradle_path, "r", encoding="utf-8") as f:
@@ -56,7 +79,7 @@ for line in lines:
 print(f"📂 Current version in build.gradle: {current_version}")
 
 # ===============================
-# Step 3: Update dependency if necessary
+# Step 4: Update dependency if necessary
 # ===============================
 if current_version != site_version:
     new_lines = []
@@ -73,8 +96,12 @@ if current_version != site_version:
 
     branch = f"update-{DEPENDENCY_ARTIFACT}-v{site_version}"
     tag = f"{DEPENDENCY_ARTIFACT}-v{site_version}"
+    
+    timestamp = int(time.time())
+    branch = f"update-{DEPENDENCY_ARTIFACT}-v{site_version}-{timestamp}"
+    tag = f"{DEPENDENCY_ARTIFACT}-v{site_version}"
 
-    # Create branch, commit, and push changes
+    # Git configuration and push
     subprocess.run(["git", "checkout", "-b", branch], check=True)
     subprocess.run(["git", "config", "user.name", "github-actions"], check=True)
     subprocess.run(["git", "config", "user.email", "github-actions@github.com"], check=True)
@@ -83,12 +110,25 @@ if current_version != site_version:
     subprocess.run(["git", "push", "origin", branch], check=True)
 
     # Create git tag and push it
-    subprocess.run(["git", "tag", "-a", tag, "-m", f"Release {DEPENDENCY_ARTIFACT} {site_version} ({release_date})"], check=True)
+    subprocess.run([
+        "git", "tag", "-a", tag,
+        "-m", f"Release {DEPENDENCY_ARTIFACT} {site_version} ({release_date})"
+    ], check=True)
     subprocess.run(["git", "push", "origin", tag], check=True)
 
-    # Create Pull Request using GitHub CLI
+    # Build PR body dynamically with notes (if available)
+    if release_notes:
+        notes_formatted = "\n".join([f"- {note}" for note in release_notes])
+    else:
+        notes_formatted = "_No release notes available_"
+
     body = f"""
-    Automatic update of `{DEPENDENCY_GROUP}:{DEPENDENCY_ARTIFACT}` to version **{site_version}** 📅 Release date: **{release_date}** 🔗 [Official Release Notes]({URL})
+    Automatic update of `{DEPENDENCY_GROUP}:{DEPENDENCY_ARTIFACT}` to version **{site_version}** 📅  
+    **Release date:** {release_date}  
+    🔗 [Official Release Notes]({URL})
+
+    **Changelog:**
+    {notes_formatted}
     """
 
     pr_process = subprocess.run([
