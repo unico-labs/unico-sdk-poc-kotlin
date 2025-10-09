@@ -25,25 +25,19 @@ release_date = None
 release_notes = []
 header = None
 
-# Procura pelo primeiro cabeçalho <h3> que contém o texto "Versão"
-# Isso é mais específico e garante que pegamos o título da release mais recente
 for h3 in soup.find_all("h3"):
     if "Versão" in h3.get_text():
         header = h3
-        break # Para no primeiro que encontrar, que é o mais recente
+        break
 
 if header:
-    # CORREÇÃO APLICADA AQUI: Adicionado ".*?" para ignorar caracteres invisíveis
     match = re.search(r"Versão\s*([\d.]+)\s*.*?\s*-\s*(\d{2}/\d{2}/\d{4})", header.get_text())
     if match:
         site_version = match.group(1)
         release_date = match.group(2)
 
-    # A partir do cabeçalho encontrado, busca a próxima lista <ul> com as notas
     notes_block = header.find_next_sibling("ul", class_=lambda x: x and "space-y-2" in x)
-
     if notes_block:
-        # Extrai o texto de cada parágrafo <p> dentro de um item da lista <li>
         for li in notes_block.find_all("li"):
             note_p = li.find("p")
             if note_p:
@@ -56,12 +50,11 @@ if header:
 # ===============================
 if not site_version:
     print("❌ Could not capture the version from the website")
-    # Se ainda houver notas, vamos exibi-las para depuração
     if release_notes:
         print("\n📝 Release notes were found, but the version header failed to parse:")
         for note in release_notes:
             print(f"- {note}")
-    exit(1) # Use exit(1) para sinalizar um erro
+    exit(1)
 
 print(f"📦 Latest version on the website: {site_version}")
 print(f"🗓️ Release date: {release_date}")
@@ -107,12 +100,12 @@ if current_version != site_version:
 
     print(f"✅ Updated {DEPENDENCY_GROUP}:{DEPENDENCY_ARTIFACT} to version {site_version}")
 
-    branch = f"update-{DEPENDENCY_ARTIFACT}-v{site_version}"
+    # O nome da tag de versão deve ser limpo, sem timestamp.
     tag = f"{DEPENDENCY_ARTIFACT}-v{site_version}"
     
+    # Usar um timestamp para o branch é uma boa prática para garantir que ele seja único.
     timestamp = int(time.time())
     branch = f"update-{DEPENDENCY_ARTIFACT}-v{site_version}-{timestamp}"
-    tag = f"{DEPENDENCY_ARTIFACT}-v{site_version}"
 
     # Git configuration and push
     subprocess.run(["git", "checkout", "-b", branch], check=True)
@@ -122,11 +115,21 @@ if current_version != site_version:
     subprocess.run(["git", "commit", "-m", f"chore: bump {DEPENDENCY_ARTIFACT} to v{site_version}"], check=True)
     subprocess.run(["git", "push", "origin", branch], check=True)
 
-    # Create git tag and push it
+    ### AJUSTE AQUI: LÓGICA PARA GERENCIAR A TAG ###
+    # 1. Tenta deletar a tag no repositório remoto, caso ela já exista de uma execução anterior.
+    # Usamos 'check=False' para que o script NÃO pare se a tag não existir (o que é esperado na primeira vez).
+    print(f"ℹ️  Attempting to delete remote tag '{tag}' if it exists...")
+    subprocess.run(["git", "push", "origin", "--delete", tag], check=False)
+    
+    # 2. Cria a tag localmente.
+    print(f"✅ Creating local tag: {tag}")
     subprocess.run([
         "git", "tag", "-a", tag,
         "-m", f"Release {DEPENDENCY_ARTIFACT} {site_version} ({release_date})"
     ], check=True)
+    
+    # 3. Envia a nova tag para o repositório. Agora este comando não vai mais falhar.
+    print(f"🚀 Pushing new tag to remote...")
     subprocess.run(["git", "push", "origin", tag], check=True)
 
     # Build PR body dynamically with notes (if available)
@@ -152,7 +155,7 @@ if current_version != site_version:
     ], check=True, capture_output=True, text=True)
 
     pr_url = pr_process.stdout.strip()
-    print(f"✅ Pull Request created: {pr_url}")
+    print(f"🎉 Pull Request created: {pr_url}")
 
     if "GITHUB_OUTPUT" in os.environ:
         with open(os.environ["GITHUB_OUTPUT"], "a") as f:
