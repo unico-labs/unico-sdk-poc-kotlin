@@ -159,6 +159,7 @@ if current_version != site_version:
             print(f"updated=true", file=f)
             print(f"new_version={site_version}", file=f)
             print(f"release_date={release_date}", file=f)
+            print(f"release_notes={notes_formatted}", file=f)
             print(f"pr_url={pr_url}", file=f)
 
 else:
