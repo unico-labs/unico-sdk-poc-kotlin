@@ -68,7 +68,8 @@ jobs:
             A new version of `unico_check` has been released and a PR was automatically created.
             *📦 Version:* `${{ steps.update_script.outputs.new_version }}`
             *🗓 Release Date:* `${{ steps.update_script.outputs.release_date }}`
-            *📝 Release Notes:* ``` 
+            *📝 Release Notes:*
+            ``` 
             ${{ steps.update_script.outputs.release_notes }}
             ```
             *🔗 PR:* <${{ steps.update_script.outputs.pr_url }}|Click here to review>
