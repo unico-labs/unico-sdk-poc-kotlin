@@ -8,7 +8,7 @@ import time
 # ===============================
 # Settings
 # ===============================
-URL = "https://devcenter.unico.io/idcloud/integracao/sdk/integracao-sdks/sdk-android/release-notes"
+URL = "https://devcenter.unico.io/unico-idcloud/by-client-integration/pt/sdk/sdks-disponiveis/sdk-android/release-notes"
 DEPENDENCY_GROUP = "io.unico"
 DEPENDENCY_ARTIFACT = "capture"
 REPO_PATH = "."  # Path to the local repository
