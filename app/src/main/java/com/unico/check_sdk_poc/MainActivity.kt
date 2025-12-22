@@ -208,11 +208,11 @@ class MainActivity : AppCompatActivity(),
         addLog("Camera pronta.")
 
         // SEM webAppToken 
-        //cameraOpener.open(this)
+        cameraOpener.open(this)
 
         // Token gerado pelo backend do cliente ao criar um processo
         // Retorna onSuccess(result: SuccessResult) com result.processId
-        cameraOpener.open(this, "webAppToken")
+        //cameraOpener.open(this, "webAppToken")
     }
 
     override fun onCameraFailed(error: String?) {
