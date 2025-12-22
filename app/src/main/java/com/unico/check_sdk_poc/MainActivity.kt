@@ -18,6 +18,7 @@ import com.acesso.acessobio_android.onboarding.models.Environment
 import com.acesso.acessobio_android.onboarding.types.DocumentType
 import com.acesso.acessobio_android.services.dto.ErrorBio
 import com.acesso.acessobio_android.services.dto.ResultCamera
+import com.acesso.acessobio_android.services.dto.SuccessResult
 
 class MainActivity : AppCompatActivity(),
     AcessoBioListener,
@@ -190,6 +191,14 @@ class MainActivity : AppCompatActivity(),
         textField.text = error.toString()
     }
 
+    override fun onSuccess(result: SuccessResult) {
+        addLog("Processo finalizado com sucesso.")
+        textField.text = "Processo finalizado com sucesso."
+
+        addLog("ProcessId: ${result.processId}")
+        Log.d(TAG, "PROCESS ID: ${result.processId}")
+    }
+
     override fun onCameraReady(document: UnicoCheckCameraOpener.Document?) {
         addLog("DocumentCamera pronto.")
         document?.open(documentType, this)
@@ -197,7 +206,13 @@ class MainActivity : AppCompatActivity(),
 
     override fun onCameraReady(cameraOpener: UnicoCheckCameraOpener.Camera) {
         addLog("Camera pronta.")
-        cameraOpener.open(this)
+
+        // SEM webAppToken 
+        //cameraOpener.open(this)
+
+        // Token gerado pelo backend do cliente ao criar um processo
+        // Retorna onSuccess(result: SuccessResult) com result.processId
+        cameraOpener.open(this, "webAppToken")
     }
 
     override fun onCameraFailed(error: String?) {
