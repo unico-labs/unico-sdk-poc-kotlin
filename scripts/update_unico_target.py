@@ -8,7 +8,7 @@ import time
 # ===============================
 # Settings
 # ===============================
-URL = "https://devcenter.unico.io/unico-idcloud/by-client-integration/pt/sdk/sdks-disponiveis/sdk-android/release-notes"
+URL = "https://developer.unico.io/pt-BR/developers/sdks-and-tools/android/resources/release-notes"
 DEPENDENCY_GROUP = "io.unico"
 DEPENDENCY_ARTIFACT = "capture"
 REPO_PATH = "."  # Path to the local repository
@@ -23,27 +23,27 @@ soup = BeautifulSoup(response.text, "html.parser")
 site_version = None
 release_date = None
 release_notes = []
-header = None
 
-for h3 in soup.find_all("h3"):
-    if "Versão" in h3.get_text():
-        header = h3
-        break
+content = soup.select_one("div.theme-doc-markdown")
+header = content.find("h2") if content else None
 
 if header:
-    match = re.search(r"Versão\s*([\d.]+)\s*.*?\s*-\s*(\d{2}/\d{2}/\d{4})", header.get_text())
-    if match:
-        site_version = match.group(1)
-        release_date = match.group(2)
+    site_version = header.get_text(strip=True)
 
-    notes_block = header.find_next_sibling("ul", class_=lambda x: x and "space-y-2" in x)
+    # A data no site vem no formato MM/DD/YYYY; convertemos para DD/MM/YYYY
+    date_tag = header.find_next_sibling("p")
+    if date_tag:
+        date_match = re.search(r"(\d{2})/(\d{2})/(\d{4})", date_tag.get_text())
+        if date_match:
+            month, day, year = date_match.groups()
+            release_date = f"{day}/{month}/{year}"
+
+    notes_block = header.find_next_sibling("ul")
     if notes_block:
         for li in notes_block.find_all("li"):
-            note_p = li.find("p")
-            if note_p:
-                text = note_p.get_text(strip=True)
-                if text:
-                    release_notes.append(text)
+            text = li.get_text(strip=True)
+            if text:
+                release_notes.append(text)
 
 # ===============================
 # Step 2: Validate extracted data
